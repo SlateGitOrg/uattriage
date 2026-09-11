@@ -1,0 +1,14 @@
+[project]
+name = "uattriage"
+version = "0.1.0"
+description = "UAT analytics that answer 'are we ready to go live' with a projected date and an uncertainty band, not a defect count."
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
