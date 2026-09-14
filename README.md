@@ -2,6 +2,22 @@
 
 > UAT analytics that answer 'are we ready to go live' with a projected date and an uncertainty band, not a defect count.
 
+## Live deployment
+
+[![CI and deployment](https://github.com/SlateGitOrg/uattriage/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SlateGitOrg/uattriage/actions/workflows/ci.yml)
+
+[Open the interactive UAT Triage demo](https://slategitorg.github.io/uattriage/)
+
+The deployed interface uses a deterministic offline scenario to make the repository's tested decision rule visible without external services or private data.
+
+### Desktop
+
+![UAT Triage desktop deployment](docs/assets/deployed-desktop.png)
+
+### Mobile
+
+<img src="docs/assets/deployed-mobile.png" alt="UAT Triage mobile deployment" width="390">
+
 `COMPACT` · **Business Analyst** · Intermediate · ~4-5 days · Public sector - benefits system replacement
 
 **Primary language:** Python
