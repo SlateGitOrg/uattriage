@@ -6,9 +6,9 @@
 
 [![CI and deployment](https://github.com/SlateGitOrg/uattriage/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SlateGitOrg/uattriage/actions/workflows/ci.yml)
 
-[Open the interactive UAT Triage demo](https://slategitorg.github.io/uattriage/)
+[Open the working UAT Triage application](https://slategitorg.github.io/uattriage/)
 
-The deployed interface uses a deterministic offline scenario to make the repository's tested decision rule visible without external services or private data.
+This deployed application runs the project's decision workflow in the browser. Change the inputs, run the analysis, and inspect the computed metrics and decision trace.
 
 ### Desktop
 
