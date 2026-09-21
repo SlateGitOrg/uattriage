@@ -1,0 +1,19 @@
+
+const n=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
+const clamp=(value,low,high)=>Math.min(high,Math.max(low,value));
+const round=(value,digits=2)=>Number(value.toFixed(digits));
+const mean=values=>values.length?values.reduce((sum,value)=>sum+value,0)/values.length:0;
+const parseJSON=(value,fallback=[])=>{try{return JSON.parse(value)}catch{return fallback}};
+const valuesFrom=value=>String(value).split(/[\s,]+/).map(Number).filter(Number.isFinite);
+const result=(status,summary,metrics,rows,detail='')=>({status,summary,metrics,rows,detail});
+const erf=x=>{const sign=x<0?-1:1,a=Math.abs(x),t=1/(1+0.3275911*a);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-a*a);return sign*y};
+const normalCdf=z=>0.5*(1+erf(z/Math.sqrt(2)));
+const wilson=(successes,total)=>{if(!total)return[0,0];const z=1.96,p=successes/total,d=1+z*z/total,c=(p+z*z/(2*total))/d,h=z*Math.sqrt((p*(1-p)+z*z/(4*total))/total)/d;return[clamp(c-h,0,1),clamp(c+h,0,1)]};
+const sha256=async value=>{const bytes=new TextEncoder().encode(String(value));const digest=await crypto.subtle.digest('SHA-256',bytes);return[...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('')};
+const tag=(xml,name)=>xml.match(new RegExp('<'+name+'[^>]*>([\\s\\S]*?)<\\/'+name+'>','i'))?.[1]?.trim()??'';
+const similarity=(a,b)=>{const x=String(a).toLowerCase(),y=String(b).toLowerCase();if(x===y)return 1;const A=new Set(x.split(/\W+/).filter(Boolean)),B=new Set(y.split(/\W+/).filter(Boolean));const inter=[...A].filter(v=>B.has(v)).length;return inter/Math.max(1,new Set([...A,...B]).size)};
+
+export const meta={"slug":"uattriage","name":"UAT Triage","eyebrow":"Release-readiness forecast","description":"Project a readiness date from defect arrival, closure capacity, and reopen rates.","fields":[{"name":"openDefects","label":"Open defects","type":"number","min":0,"max":10000,"step":1,"help":""},{"name":"dailyArrivals","label":"New defects per day","type":"number","min":0,"max":100,"step":0.1,"help":""},{"name":"dailyClosures","label":"Closure capacity per day","type":"number","min":0,"max":100,"step":0.1,"help":""},{"name":"reopenRate","label":"Reopen rate","type":"number","min":0,"max":1,"step":0.01,"help":""},{"name":"targetOpen","label":"Ready threshold","type":"number","min":0,"max":100,"step":1,"help":""}]};
+export const initialState={"openDefects":74,"dailyArrivals":5.2,"dailyClosures":11,"reopenRate":0.08,"targetOpen":8};
+export const alternateState={"openDefects":74,"dailyArrivals":9,"dailyClosures":8,"reopenRate":0.15,"targetOpen":8};
+export async function compute(i){const open=n(i.openDefects),arr=n(i.dailyArrivals),closures=n(i.dailyClosures),reopen=n(i.reopenRate),target=n(i.targetOpen),net=closures*(1-reopen)-arr;if(net<=0)return result('Not identifiable','The backlog is not shrinking under the current operating assumptions.',[{label:'Net burn',value:round(net)},{label:'Required extra closures',value:round(1-net)},{label:'Open defects',value:open}],[{signal:'Arrival rate',value:arr},{signal:'Effective closures',value:round(closures*(1-reopen))}], 'Increase closure capacity or reduce reopen rate.');const days=Math.ceil(Math.max(0,open-target)/net),uncertainty=Math.ceil(days*(.12+reopen));return result('Forecast available',`Readiness threshold is projected in ${days} days, with ±${uncertainty} days of operating uncertainty.`,[{label:'Days to ready',value:days},{label:'Net burn per day',value:round(net)},{label:'Uncertainty',value:`±${uncertainty} days`}],[{signal:'Current backlog',value:open},{signal:'Target backlog',value:target},{signal:'Effective closures',value:round(closures*(1-reopen))},{signal:'New arrivals',value:arr}], 'Projection refuses to publish a date when net burn is zero or negative.')}
