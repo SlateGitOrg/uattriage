@@ -1,6 +1,6 @@
 """Reliability-growth fitting for UAT readiness.
 
-THE DIFFERENTIATOR LIVES HERE.
+The core of the project lives here.
 
 "We have 600 open defects" cannot answer "are we ready to go live?", so the
 decision gets made on confidence instead. What the project manager actually
